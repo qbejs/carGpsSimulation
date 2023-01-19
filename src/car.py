@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from rich.console import Console
 from rich.table import Table
+from tqdm import tqdm
 
 from src.geo_service import GeoService
 from src.gps_device import GPSDevice
@@ -34,7 +35,7 @@ class Car:
 
         console.print(f"Started at {start_time}")
 
-        for step in self.route.route:
+        for step in tqdm(self.route.route):
             distance = self.gps.distance_from_prev_step(step)
             self.obd.speed = self.calculate_speed(distance)
             self.fuel_level -= self.calculate_fuel_consumption(distance)
