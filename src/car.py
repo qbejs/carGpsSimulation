@@ -49,14 +49,12 @@ class Car:
                     }
                 )
                 self.fuel_level = self.fuel_capacity
-            self.obd.throttle_position = self.obd.speed / self.route.speed_limit
-            self.obd.tire_pressure = self.obd.speed / self.route.speed_limit
 
             table.add_row(
-                str(self.obd.speed),
+                str(round(self.obd.speed)),
                 str(self.obd.throttle_position),
-                str(self.fuel_level),
-                str(self.obd.tire_pressure),
+                str(round(self.fuel_level)),
+                "OK[42,41,40,40]",
             )
             self.gps.current_location = step
 
