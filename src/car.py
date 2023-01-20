@@ -2,6 +2,7 @@ import math
 import random
 from datetime import datetime, timedelta
 
+from rich import box
 from rich.console import Console
 from rich.table import Table
 from tqdm import tqdm
@@ -31,12 +32,13 @@ class Car:
         console = Console()
         console.print(f"Started_at={start_time}")
         console.print(f"Distance={self.route.distance}")
-        table = Table(title="Route summary")
-        table.add_column("Speed", justify="center", no_wrap=True)
-        table.add_column("Throttle", justify="center", no_wrap=True)
-        table.add_column("Fuel", justify="center", no_wrap=True)
-        table.add_column("Tire", justify="center", no_wrap=True)
-        table.add_column("Distance", justify="center", no_wrap=True)
+        table = Table(title="Route summary", box=box.HEAVY, expand=True)
+        table.add_column("Speed (kmh)", justify="center", no_wrap=True)
+        table.add_column("Throttle (%)", justify="center", no_wrap=True)
+        table.add_column("Fuel (%)", justify="center", no_wrap=True)
+        table.add_column("Tire (psi)", justify="center")
+        table.add_column("Distance(m)", justify="center", no_wrap=True)
+        table.add_column("Position", justify="center")
 
         for step in tqdm(self.route.route):
             distance = self.gps.distance_from_prev_step(step)
@@ -59,7 +61,8 @@ class Car:
                 str(random.randint(25, 90)),
                 str(round(self.fuel_level)),
                 f"OK {self.generate_tire_pressure()}",
-                str(round(dys, 2))
+                str(round(dys, 2)),
+                str(step)
             )
             self.gps.current_location = step
 
