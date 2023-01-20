@@ -1,15 +1,12 @@
-import time
-
 from rich.console import Console
-from rich.progress import track
 
 from src.car import Car
 
 if __name__ == '__main__':
     console = Console()
-    console.print("Podaj adres startu")
+    console.print("Enter start address (Country, City, Street)")
     start_point = input()
-    console.print("Podaj adres docelowy")
+    console.print("Enter end address (Country, City, Street)")
     end_point = input()
 
     car = Car(start_point, end_point)

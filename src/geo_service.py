@@ -1,13 +1,17 @@
 import json
+from random import Random
+
 import osrm
 import requests
 
 
 class GeoService:
     client: osrm
+    randomizer: Random
 
     def __init__(self):
         self.client = osrm.Client(host="https://router.project-osrm.org")
+        self.randomizer = Random()
 
     def geocode(self, location):
         url = f"https://nominatim.openstreetmap.org/search?q={location}&format=json"
@@ -27,11 +31,15 @@ class GeoService:
             and "geometry" in response["routes"][0]
             and "coordinates" in response["routes"][0]["geometry"]
         ):
-            return response["routes"][0]["geometry"]["coordinates"]
+            return [
+                response["routes"][0]["legs"][0]["distance"],
+                response["routes"][0]["geometry"]["coordinates"]
+            ]
 
         raise Exception(
             f"Cannot retrieve route from project-osrm.org. Details: {response}] "
         )
 
-    def get_speed_limit(self, route):
-        return 60
+    def get_speed_limit(self, route) -> int:
+        return self.randomizer.randint(a=40, b=80)
+

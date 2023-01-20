@@ -1,4 +1,5 @@
 import math
+import random
 from datetime import datetime, timedelta
 
 from rich.console import Console
@@ -26,17 +27,20 @@ class Car:
     def drive(self):
         self.gps.start_navigation(self.route.route)
         start_time = datetime.now()
+        dys = self.route.distance
         console = Console()
-        table = Table(title="Car GPS Simulation")
+        console.print(f"Started_at={start_time}")
+        console.print(f"Distance={self.route.distance}")
+        table = Table(title="Route summary")
         table.add_column("Speed", justify="center", no_wrap=True)
         table.add_column("Throttle", justify="center", no_wrap=True)
         table.add_column("Fuel", justify="center", no_wrap=True)
         table.add_column("Tire", justify="center", no_wrap=True)
-
-        console.print(f"Started at {start_time}")
+        table.add_column("Distance", justify="center", no_wrap=True)
 
         for step in tqdm(self.route.route):
             distance = self.gps.distance_from_prev_step(step)
+            dys = dys - distance
             self.obd.speed = self.calculate_speed(distance)
             self.fuel_level -= self.calculate_fuel_consumption(distance)
             if self.fuel_level <= 0:
@@ -52,9 +56,10 @@ class Car:
 
             table.add_row(
                 str(round(self.obd.speed)),
-                str(self.obd.throttle_position),
+                str(random.randint(25, 90)),
                 str(round(self.fuel_level)),
-                "OK[42,41,40,40]",
+                f"OK {self.generate_tire_pressure()}",
+                str(round(dys, 2))
             )
             self.gps.current_location = step
 
@@ -77,3 +82,6 @@ class Car:
         speed = self.obd.speed
         fuel_consumption = (distance / 100) * (self.fuel_efficiency + (speed * 0.01))
         return fuel_consumption
+
+    def generate_tire_pressure(self) -> list:
+        return random.sample(range(37, 42), 4)
