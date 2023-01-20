@@ -2,6 +2,7 @@ import math
 import random
 from datetime import datetime, timedelta
 
+import numpy as np
 from rich import box
 from rich.console import Console
 from rich.table import Table
@@ -23,7 +24,11 @@ class Car:
         self.reserve_fuel = 10  # Reserve fuel level in liters
         self.vehicle_mass = 3.5  # Mass of the vehicle in tons
         self.fuel_efficiency = 8  # liters/100km
+        self.current_speed = 0
+        self.distance_counter = 0
         self.fuel_stops = []
+        self.speed_interpolation = np.linspace(0, self.route.speed_limit*28, int(self.route.distance))
+        self.status = ['OK', 'MIL_CHECK', 'STOP']
 
     def drive(self):
         self.gps.start_navigation(self.route.route)
@@ -39,6 +44,7 @@ class Car:
         table.add_column("Tire (psi)", justify="center")
         table.add_column("Distance(m)", justify="center", no_wrap=True)
         table.add_column("Position", justify="center")
+        table.add_column("OBD Status", justify="center", no_wrap=True)
 
         for step in tqdm(self.route.route):
             distance = self.gps.distance_from_prev_step(step)
@@ -62,7 +68,8 @@ class Car:
                 str(round(self.fuel_level)),
                 f"OK {self.generate_tire_pressure()}",
                 str(round(dys, 2)),
-                str(step)
+                str(step),
+                str(random.choices(self.status, weights=(80, 10, 1), k=1))
             )
             self.gps.current_location = step
 
@@ -71,14 +78,9 @@ class Car:
         console.print(self.fuel_stops)
 
     def calculate_speed(self, distance):
-        # calculate the speed based on the distance and vehicle mass
-        speed_limit = self.route.speed_limit
-        max_speed = speed_limit * 0.9
-        vehicle_mass = self.vehicle_mass
-        g = 9.81
-        acceleration = g * vehicle_mass
-        speed = min(math.sqrt(2 * acceleration * distance), max_speed)
-        return speed
+        self.current_speed = self.speed_interpolation[int(self.distance_counter)]
+        self.distance_counter += 1
+        return self.current_speed
 
     def calculate_fuel_consumption(self, distance):
         # calculate the fuel consumption based on the distance and vehicle speed

@@ -27,9 +27,9 @@ class GeoService:
         )
 
         if (
-            "routes" in response
-            and "geometry" in response["routes"][0]
-            and "coordinates" in response["routes"][0]["geometry"]
+                "routes" in response
+                and "geometry" in response["routes"][0]
+                and "coordinates" in response["routes"][0]["geometry"]
         ):
             return [
                 response["routes"][0]["legs"][0]["distance"],
@@ -41,5 +41,5 @@ class GeoService:
         )
 
     def get_speed_limit(self, route) -> int:
-        return self.randomizer.randint(a=40, b=80)
-
+        # To refactor. Goal is to find actual speed limit based on route geometry coordinates
+        return 60
